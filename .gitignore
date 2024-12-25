@@ -1,0 +1,4 @@
+.vscode
+.env
+nginx/nginx.prod.conf
+compose.prod.yaml
