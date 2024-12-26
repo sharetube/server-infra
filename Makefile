@@ -37,3 +37,9 @@ run:
 .PHONY: rund
 rund:
 	docker compose -f ${COMPOSE_FILE} up --build -d
+
+.PHONY: pull
+pull:
+	docker-compose pull
+	docker-compose up -d --force-recreate
+	docker image prune -a -f
