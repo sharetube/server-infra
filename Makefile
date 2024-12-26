@@ -1,4 +1,7 @@
-COMPOSE_ENV ?= dev
+# Load only COMPOSE_ENV from .env
+export COMPOSE_ENV := $(shell grep ^COMPOSE_ENV .env | cut -d '=' -f2-)
+COMPOSE_ENV ?= dev  # Default value if COMPOSE_ENV is not found in .env
+
 COMPOSE_FILE=compose.$(COMPOSE_ENV).yaml
 
 .PHONY: gen-env-example

@@ -71,7 +71,7 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: nginx
+    container_name: sharetube-nginx
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
