@@ -12,6 +12,10 @@ gen-env-example:
 down:
 	docker compose -f ${COMPOSE_FILE} down
 
+.PHONY: clean
+clean:
+	docker compose -f ${COMPOSE_FILE} down -v --remove-orphans
+
 .PHONY: up
 up:
 	docker compose -f ${COMPOSE_FILE} up
