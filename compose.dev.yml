@@ -30,7 +30,7 @@ services:
     image: grafana/loki:3.3.2
     container_name: sharetube-loki
     ports:
-      - "3100:3100"
+      - 3100:3100
     volumes:
       - ./loki/loki-config.yml:/etc/loki/local-config.yml:ro
     command: -config.file=/etc/loki/local-config.yml
@@ -43,7 +43,7 @@ services:
     depends_on:
       - fluent-bit
     ports:
-      - "3000:3000"
+      - 3000:3000
     volumes:
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
     env_file:
@@ -52,13 +52,13 @@ services:
     - sharetube
 
   server:
-    image: sharetube/server:latest # use local image
+    image: sharetube-server-dev:latest # use local image
     # image: sharetube/server:latest
     container_name: sharetube-server
     env_file:
       - .env
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      - ${SERVER_PORT}
     restart: unless-stopped
     depends_on:
       - redis
