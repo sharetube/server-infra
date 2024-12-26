@@ -21,7 +21,8 @@ services:
       - "24224:24224/udp"
     volumes:
       - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
-      - logs:/logs:ro
+      - nginx-logs:/logs/nginx:ro
+      - server-logs:/logs/sharetube:ro
     depends_on:
       - loki
     networks:
@@ -46,7 +47,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana:/var/lib/grafana
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
@@ -54,7 +55,7 @@ services:
     - sharetube
 
   server:
-    image: sharetube-server:latest
+    image: sharetube/server:latest
     container_name: sharetube-server
     env_file:
       - .env
@@ -65,27 +66,29 @@ services:
       - redis
       - fluent-bit
     volumes:
-      - logs:/var/log
+      - server-logs:/var/log/sharetube
     networks:
       - sharetube
 
   nginx:
-    image: nginx:latest
+    image: nginx:1.27-alpine
     container_name: sharetube-nginx
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - nginx-logs:/var/log/nginx
     depends_on:
       - server
     ports:
       - "80:80"
       - "443:443"
+    logging:
+      driver: none
     networks:
       - sharetube
 
 volumes:
-  grafana:
-  logs:
+  server-logs:
+  nginx-logs:
 
 networks:
   sharetube:

@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := rund
+
 # Load only COMPOSE_ENV from .env
 export COMPOSE_ENV := $(shell grep ^COMPOSE_ENV .env | cut -d '=' -f2-)
 COMPOSE_ENV ?= dev  # Default value if COMPOSE_ENV is not found in .env
