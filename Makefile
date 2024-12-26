@@ -40,6 +40,6 @@ rund:
 
 .PHONY: pull
 pull:
-	docker-compose pull
-	docker-compose up -d --force-recreate
+	docker compose -f ${COMPOSE_FILE} pull
+	docker compose -f ${COMPOSE_FILE} up -d --force-recreate
 	docker image prune -a -f

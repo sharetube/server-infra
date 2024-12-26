@@ -20,9 +20,7 @@ services:
       - "24224:24224"
       - "24224:24224/udp"
     volumes:
-      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
-      - nginx-logs:/logs/nginx:ro
-      - server-logs:/logs/sharetube:ro
+      - ./fluent-bit:/fluent-bit/etc:ro
     depends_on:
       - loki
     networks:
@@ -48,14 +46,13 @@ services:
       - "3000:3000"
     volumes:
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    env_file:
+      - .env
     networks:
     - sharetube
 
   server:
-    image: server:latest # use local image
+    image: sharetube/server:latest # use local image
     # image: sharetube/server:latest
     container_name: sharetube-server
     env_file:
@@ -66,8 +63,12 @@ services:
     depends_on:
       - redis
       - fluent-bit
-    volumes:
-      - server-logs:/var/log/sharetube
+    stop_grace_period: 30s
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: sharetube
     networks:
       - sharetube
 
@@ -76,18 +77,18 @@ services:
     container_name: sharetube-nginx
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      - nginx-logs:/var/log/nginx
     depends_on:
       - server
     ports:
       - "80:80"
       - "443:443"
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: nginx
     networks:
       - sharetube
-
-volumes:
-  server-logs:
-  nginx-logs:
 
 networks:
   sharetube:
