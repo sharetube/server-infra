@@ -55,7 +55,8 @@ services:
     - sharetube
 
   server:
-    image: sharetube/server:latest
+    image: server:latest # use local image
+    # image: sharetube/server:latest
     container_name: sharetube-server
     env_file:
       - .env
@@ -81,8 +82,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    logging:
-      driver: none
     networks:
       - sharetube
 
