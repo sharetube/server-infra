@@ -6,50 +6,12 @@ services:
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
     healthcheck:
-      test: ["CMD", "redis-cli","-p", "${REDIS_PORT}","ping"]
+      test: ["CMD", "redis-cli", "-p", "${REDIS_PORT}", "ping"]
       interval: 1s
       timeout: 1s
       retries: 10
     networks:
       - sharetube
-
-  fluent-bit:
-    image: fluent/fluent-bit:3.2.3
-    container_name: sharetube-fluent-bit
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
-    volumes:
-      - ./fluent-bit:/fluent-bit/etc:ro
-    depends_on:
-      - loki
-    networks:
-    - sharetube
-
-  loki:
-    image: grafana/loki:3.3.2
-    container_name: sharetube-loki
-    ports:
-      - 3100:3100
-    volumes:
-      - ./loki/loki-config.yml:/etc/loki/local-config.yml:ro
-    command: -config.file=/etc/loki/local-config.yml
-    networks:
-    - sharetube
-
-  grafana:
-    image: grafana/grafana:11.4.0
-    container_name: sharetube-grafana
-    depends_on:
-      - fluent-bit
-    ports:
-      - 3000:3000
-    volumes:
-      - ./grafana/datasources:/etc/grafana/provisioning/datasources
-    env_file:
-      - .env
-    networks:
-    - sharetube
 
   server:
     image: sharetube-server-dev:latest # use local image
@@ -62,13 +24,7 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
-      - fluent-bit
     stop_grace_period: 30s
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: localhost:24224
-        tag: sharetube
     networks:
       - sharetube
 
@@ -83,11 +39,6 @@ services:
       - "80:80"
       - "443:443"
     command: nginx -g "daemon off;"
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: localhost:24224
-        tag: nginx
     networks:
       - sharetube
 
